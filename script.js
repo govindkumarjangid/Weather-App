@@ -12,14 +12,19 @@ let w_humidity = document.querySelector(".weather_humidity");
 let w_wind = document.querySelector(".weather_wind");
 let w_pressure = document.querySelector(".weather_pressure");
 let citySearch = document.querySelector(".weather_search");
+let lat = document.querySelector('.weather_lat');
+let lon = document.querySelector('.weather_long');
+let winddeg = document.querySelector('.weather_winddeg');
+let sunrise = document.querySelector('.weather_sunrise');
+let sunset = document.querySelector('.weather_sunset');
 
 const getCountryName = (code) => {
     return new Intl.DisplayNames([code], { type: "region" }).of(code);
 };
 
 const getDateTime = (dt) => {
-    const curDate = new Date(dt * 1000); // Convert seconds to milliseconds
-    console.log(curDate);
+    // Convert seconds to milliseconds
+    const curDate = new Date(dt * 1000);
     const options = {
         weekday: "long",
         year: "numeric",
@@ -28,30 +33,27 @@ const getDateTime = (dt) => {
         hour: "numeric",
         minute: "numeric",
     };
-
     const formatter = new Intl.DateTimeFormat("en-US", options);
-    console.log(formatter);
     return formatter.format(curDate);
 }
 let city = "jaipur";
 citySearch.addEventListener('submit', (e) => {
     e.preventDefault();
     let cityName = document.querySelector(".city_name");
-    console.log(cityName.value);
-
     city = cityName.value;
     getWeatherData();
     cityName.value = '';
 })
 
 
-const getWeatherData = async () => {
+const getWeatherData = async() => {
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&lon={lon}&appid=41e27946beea978b29abf01e65e8d655`;
     try {
         const res = await fetch(weatherUrl);
         const data = await res.json();
         console.log(data);
-        const { main, name, weather, wind, sys, dt } = data;
+        console.log(new Date(data.sys.sunrise * 1000).toLocaleTimeString());
+        const { main, name, weather, wind, sys, dt, coord } = data;
         cityName.innerHTML = `${name}, ${getCountryName(sys.country)}`;
         dateTime.innerHTML = getDateTime(dt);
         w_forecast.innerHTML = `${weather[0].main}`;
@@ -63,8 +65,15 @@ const getWeatherData = async () => {
         w_humidity.innerHTML = `${main.humidity} %`;
         w_wind.innerHTML = `${wind.speed} m/s`;
         w_pressure.innerHTML = `${main.pressure} hPa`;
+        lat.innerHTML = `${coord.lat}`;
+        lon.innerHTML = `${coord.lon}`;
+        winddeg.innerHTML = `${wind.deg}&#176`;
+        let rise = new Date(sys.sunrise * 1000).toLocaleTimeString();
+        sunrise.innerHTML = rise;
+        let set = new Date(sys.sunset * 1000).toLocaleTimeString();
+        sunset.innerHTML = set;
     } catch (error) {
-        console.log(error); 
+        console.log(error);
 
     }
 }

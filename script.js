@@ -46,13 +46,11 @@ citySearch.addEventListener('submit', (e) => {
 })
 
 
-const getWeatherData = async() => {
+const getWeatherData = async () => {
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&lon={lon}&appid=41e27946beea978b29abf01e65e8d655`;
     try {
         const res = await fetch(weatherUrl);
         const data = await res.json();
-        console.log(data);
-        console.log(new Date(data.sys.sunrise * 1000).toLocaleTimeString());
         const { main, name, weather, wind, sys, dt, coord } = data;
         cityName.innerHTML = `${name}, ${getCountryName(sys.country)}`;
         dateTime.innerHTML = getDateTime(dt);

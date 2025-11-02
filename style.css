@@ -114,7 +114,7 @@ input::placeholder {
     font-size: 1.3rem;
     margin: 0.5rem;
 }
-
+     
 .weather_info {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

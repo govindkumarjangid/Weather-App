@@ -224,7 +224,7 @@ input:checked + .slider:before {
 
 .city_name {
     width: 100%;
-    padding: 1.1rem 3.5rem 1.1rem 3.2rem;
+    padding: 1.1rem 5.4rem 1.1rem 3.2rem;
     border-radius: 1.25rem;
     border: 1px solid var(--card-border);
     background: rgba(0, 0, 0, 0.25);
@@ -285,6 +285,32 @@ input:checked + .slider:before {
 
 .search-btn:active {
     transform: translateY(-50%) scale(0.95);
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 3.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    color: var(--text-primary);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.clear-search-btn:active {
+    transform: translateY(-50%) scale(0.9);
 }
 
 /* Quick City Tags */
@@ -558,6 +584,31 @@ input:checked + .slider:before {
     border-radius: 10px;
     transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%);
+    animation: shimmer 3s infinite linear;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 #clouds-bar {
@@ -585,22 +636,26 @@ input:checked + .slider:before {
 
 .compass {
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     border: 2px solid rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .compass-arrow {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     color: var(--accent);
     transform: rotate(0deg);
-    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
     display: inline-block;
+    filter: drop-shadow(0 0 4px var(--accent-glow));
 }
 
 .compass-dir {
@@ -686,6 +741,45 @@ input:checked + .slider:before {
     color: var(--text-secondary);
     text-align: center;
     margin-top: 0.5rem;
+}
+
+/* Sun Path SVG Styling */
+.sun-path-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 1.2rem 0 0.4rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.sun-path-svg {
+    width: 100%;
+    max-height: 80px;
+    overflow: visible;
+}
+
+#sun-node {
+    transition: all 0.5s ease-out;
+    filter: drop-shadow(0 0 6px #fbbf24) drop-shadow(0 0 12px #fbbf24);
+}
+
+#sun-curve-active {
+    transition: stroke-dashoffset 0.5s ease-out;
+}
+
+.sun-position-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fbbf24;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(251, 191, 36, 0.08);
+    padding: 0.2rem 0.75rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Coordinates and maps */
@@ -878,6 +972,36 @@ input:checked + .slider:before {
     0%, 100% { opacity: 1; }
     50% { opacity: .6; }
 }
+
+/* Entrance Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+
+.main-weather-card.fade-in-up {
+    animation-delay: 0.05s;
+}
+
+.metrics-grid .metric-card:nth-child(1) { animation-delay: 0.1s; }
+.metrics-grid .metric-card:nth-child(2) { animation-delay: 0.15s; }
+.metrics-grid .metric-card:nth-child(3) { animation-delay: 0.20s; }
+.metrics-grid .metric-card:nth-child(4) { animation-delay: 0.25s; }
+.metrics-grid .metric-card:nth-child(5) { animation-delay: 0.30s; }
+.metrics-grid .metric-card:nth-child(6) { animation-delay: 0.35s; }
+.metrics-grid .metric-card:nth-child(7) { animation-delay: 0.40s; }
+.metrics-grid .metric-card:nth-child(8) { animation-delay: 0.45s; }
 
 /* Media Queries & Responsiveness */
 @media (max-width: 1024px) {

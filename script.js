@@ -40,6 +40,7 @@ const elLoading = document.getElementById("loading-overlay");
 const elErrorCard = document.getElementById("error-card");
 const elDashboardContent = document.getElementById("dashboard-content");
 const elRetryBtn = document.getElementById("retry-btn");
+const elClearSearchBtn = document.getElementById("clear-search-btn");
 
 let cachedWeatherData = null;
 let currentUnit = "C";
@@ -183,6 +184,16 @@ const getVisibilityStatus = (meters) => {
     return "Low visibility / Fog";
 };
 
+const triggerCardAnimations = () => {
+    const cards = document.querySelectorAll(".main-weather-card, .metric-card");
+    cards.forEach(card => {
+        card.classList.remove("fade-in-up");
+        // Force reflow
+        void card.offsetWidth;
+        card.classList.add("fade-in-up");
+    });
+};
+
 // Render Weather Data UI
 const displayWeatherData = () => {
     if (!cachedWeatherData) return;
@@ -233,10 +244,59 @@ const displayWeatherData = () => {
     elLong.innerHTML = d.coord.lon.toFixed(4);
     elMapLink.href = `https://www.google.com/maps/search/?api=1&query=${d.coord.lat},${d.coord.lon}`;
 
+    // Dynamic Visual Sun Path
+    const nowSecs = Math.floor(Date.now() / 1000);
+    const sunrise = d.sys.sunrise;
+    const sunset = d.sys.sunset;
+    const sunCurve = document.getElementById("sun-curve");
+    const sunCurveActive = document.getElementById("sun-curve-active");
+    const sunNode = document.getElementById("sun-node");
+    const sunPositionText = document.getElementById("sun-position-text");
+
+    if (sunCurve && sunCurveActive && sunNode && sunPositionText) {
+        const totalLength = sunCurve.getTotalLength();
+        sunCurveActive.style.strokeDasharray = totalLength;
+
+        if (nowSecs >= sunrise && nowSecs <= sunset) {
+            // Day time
+            const progress = (nowSecs - sunrise) / (sunset - sunrise);
+            const point = sunCurve.getPointAtLength(progress * totalLength);
+            
+            sunNode.setAttribute("cx", point.x);
+            sunNode.setAttribute("cy", point.y);
+            sunNode.style.display = "block";
+            
+            // Draw active line up to current point
+            sunCurveActive.style.strokeDashoffset = totalLength - (progress * totalLength);
+            
+            const hoursLeft = Math.floor((sunset - nowSecs) / 3600);
+            const minsLeft = Math.floor(((sunset - nowSecs) % 3600) / 60);
+            sunPositionText.textContent = hoursLeft > 0 
+                ? `${hoursLeft}h ${minsLeft}m until sunset` 
+                : `${minsLeft}m until sunset`;
+        } else {
+            // Night time
+            sunNode.style.display = "none";
+            sunCurveActive.style.strokeDashoffset = totalLength; // hide active path
+            
+            if (nowSecs < sunrise) {
+                const hoursToSunrise = Math.floor((sunrise - nowSecs) / 3600);
+                const minsToSunrise = Math.floor(((sunrise - nowSecs) % 3600) / 60);
+                sunPositionText.textContent = hoursToSunrise > 0 
+                    ? `${hoursToSunrise}h ${minsToSunrise}m until sunrise` 
+                    : `${minsToSunrise}m until sunrise`;
+            } else {
+                sunPositionText.textContent = "Nighttime / Clear sky";
+            }
+        }
+    }
+
     const bodyClass = getThemeClass(d.weather[0].id, d.weather[0].icon);
     document.body.className = "";
     if (bodyClass) document.body.classList.add(bodyClass);
 
+    // Trigger card entrance animations
+    triggerCardAnimations();
 };
 
 // Fetchers
@@ -325,7 +385,22 @@ elSearchForm.addEventListener("submit", (e) => {
     if (q) {
         getWeatherDataByCity(q);
         elCityInput.value = "";
+        elClearSearchBtn.classList.add("hidden");
     }
+});
+
+elCityInput.addEventListener("input", () => {
+    if (elCityInput.value.trim().length > 0) {
+        elClearSearchBtn.classList.remove("hidden");
+    } else {
+        elClearSearchBtn.classList.add("hidden");
+    }
+});
+
+elClearSearchBtn.addEventListener("click", () => {
+    elCityInput.value = "";
+    elClearSearchBtn.classList.add("hidden");
+    elCityInput.focus();
 });
 
 elQuickCities.addEventListener("click", (e) => {

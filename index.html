@@ -44,6 +44,7 @@
             <form class="weather_search" id="search-form">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" class="city_name" id="city-input" placeholder="Search your city..." autocomplete="off" required />
+                <button type="button" class="clear-search-btn hidden" id="clear-search-btn" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
                 <button type="submit" class="search-btn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
             </form>
 
@@ -77,7 +78,7 @@
 
             <div class="dashboard-grid" id="dashboard-content">
                 <!-- Main Current Weather Box -->
-                <section class="main-weather-card">
+                <section class="main-weather-card fade-in-up">
                     <div class="weather_header_info">
                         <h2 class="weather_city" id="weather-city">Loading...</h2>
                         <p class="weather_date_time" id="weather-date-time">--</p>
@@ -111,7 +112,7 @@
                 <!-- Detailed Weather Metrics Grid (All API Data) -->
                 <section class="metrics-grid">
                     <!-- Feels Like Card -->
-                    <div class="metric-card glass-panel" id="card-feels-like">
+                    <div class="metric-card glass-panel fade-in-up" id="card-feels-like">
                         <div class="card-header">
                             <i class="fa-solid fa-temperature-three-quarters card-icon"></i>
                             <span class="card-title">Feels Like</span>
@@ -123,7 +124,7 @@
                     </div>
 
                     <!-- Humidity Card -->
-                    <div class="metric-card glass-panel" id="card-humidity">
+                    <div class="metric-card glass-panel fade-in-up" id="card-humidity">
                         <div class="card-header">
                             <i class="fa-solid fa-droplet card-icon"></i>
                             <span class="card-title">Humidity</span>
@@ -138,7 +139,7 @@
                     </div>
 
                     <!-- Wind Details Card -->
-                    <div class="metric-card glass-panel wind-card" id="card-wind">
+                    <div class="metric-card glass-panel wind-card fade-in-up" id="card-wind">
                         <div class="card-header">
                             <i class="fa-solid fa-wind card-icon"></i>
                             <span class="card-title">Wind Info</span>
@@ -164,7 +165,7 @@
                     </div>
 
                     <!-- Barometric Pressure Card -->
-                    <div class="metric-card glass-panel" id="card-pressure">
+                    <div class="metric-card glass-panel fade-in-up" id="card-pressure">
                         <div class="card-header">
                             <i class="fa-solid fa-gauge-high card-icon"></i>
                             <span class="card-title">Pressure</span>
@@ -180,7 +181,7 @@
                     </div>
 
                     <!-- Cloudiness Card -->
-                    <div class="metric-card glass-panel" id="card-clouds">
+                    <div class="metric-card glass-panel fade-in-up" id="card-clouds">
                         <div class="card-header">
                             <i class="fa-solid fa-cloud card-icon"></i>
                             <span class="card-title">Cloudiness</span>
@@ -195,7 +196,7 @@
                     </div>
 
                     <!-- Visibility Card -->
-                    <div class="metric-card glass-panel" id="card-visibility">
+                    <div class="metric-card glass-panel fade-in-up" id="card-visibility">
                         <div class="card-header">
                             <i class="fa-solid fa-eye card-icon"></i>
                             <span class="card-title">Visibility</span>
@@ -208,7 +209,7 @@
                     </div>
 
                     <!-- Sunrise & Sunset Card -->
-                    <div class="metric-card glass-panel sun-card" id="card-sun">
+                    <div class="metric-card glass-panel sun-card fade-in-up" id="card-sun">
                         <div class="card-header">
                             <i class="fa-solid fa-circle-half-stroke card-icon"></i>
                             <span class="card-title">Daylight Dynamics</span>
@@ -230,12 +231,23 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Dynamic Visual Sun Path -->
+                            <div class="sun-path-wrapper">
+                                <svg class="sun-path-svg" viewBox="0 0 100 35">
+                                    <path id="sun-curve" d="M 5,32 Q 50,2 95,32" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="3,3" />
+                                    <path id="sun-curve-active" d="M 5,32 Q 50,2 95,32" fill="none" stroke="var(--accent)" stroke-width="2" />
+                                    <circle id="sun-node" cx="5" cy="32" r="3.5" fill="#fbbf24" />
+                                </svg>
+                                <span class="sun-position-text" id="sun-position-text">Calculating...</span>
+                            </div>
+                            
                             <div class="daylight-duration" id="daylight-duration-desc">Daylight duration: --</div>
                         </div>
                     </div>
 
                     <!-- Geo-Location Card -->
-                    <div class="metric-card glass-panel" id="card-coords">
+                    <div class="metric-card glass-panel fade-in-up" id="card-coords">
                         <div class="card-header">
                             <i class="fa-solid fa-map-location-dot card-icon"></i>
                             <span class="card-title">Coordinates</span>

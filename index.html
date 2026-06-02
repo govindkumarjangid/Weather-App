@@ -4,119 +4,261 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="SkySync - A premium, beautiful glassmorphic weather app showing real-time weather forecasts, wind speed, direction, humidity, visibility, pressure, and more." />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
-    <title>Weather App</title>
+    <!-- Google Fonts: Poppins & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SkySync Weather | Beautiful Real-time Forecasts</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <section class="container">
-          <!-- input field search  -->
-            <div class="weather_header">
-                <form class="weather_search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" class="city_name" placeholder="search your city..." />
-                </form>
-            </div>
+    <!-- Background overlay elements for visual effects (blur, gradient glows) -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
 
-        <div class="main-div">
-            <!-- weather main data -->
-            <div class="weather_body">
-                <h1 class="weather_city"></h1>
-                <p class="weather_date_time"></p>
+    <!-- Top Navigation Bar (Full screen width) -->
+    <header class="app-header">
+        <h1 class="logo" id="app-logo">
+            <i class="fa-solid fa-cloud-sun-rain animate-pulse-slow"></i>
+            SkySync
+        </h1>
+        
+        <!-- Custom Toggle Switch for °C/°F -->
+        <div class="unit-toggle-container">
+            <span class="unit-label active" id="unit-c">°C</span>
+            <label class="switch" for="unit-checkbox">
+                <input type="checkbox" id="unit-checkbox" aria-label="Toggle Temperature Unit" />
+                <span class="slider round"></span>
+            </label>
+            <span class="unit-label" id="unit-f">°F</span>
+        </div>
+    </header>
 
-                <div class="weather_data">   
-                    <p class="weather_forecast"></p>
-                    <div class="weather_icon"></div>
-                </div>
-                <p class="weather_temperature"></p>
-                <div class="weather_minmax">
-                    <p class="weather_min"></p>
-                    <p class="weather_max"></p>
-                </div>
-            </div>
+    <!-- Main Content Container (Fills middle screen space, transparent background) -->
+    <main class="container" id="weather-app">
+        <!-- Search Bar and Quick City Chips -->
+        <div class="search-section">
+            <form class="weather_search" id="search-form">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="city_name" id="city-input" placeholder="Search your city..." autocomplete="off" required />
+                <button type="submit" class="search-btn" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
 
-        <!-- weather extra data  -->
-        <section class="weather_info">
-            <!-- sunrise -->
-            <div class="weather_card">
-                <i class="fa-solid fa-sun"></i>
-                <div>
-                    <p>Sunrise</p>
-                    <p class="weather_sunrise">15&#176</p>
-                </div>
+            <div class="quick-cities" id="quick-cities-container">
+                <button type="button" class="city-chip" data-city="London">London</button>
+                <button type="button" class="city-chip" data-city="New York">New York</button>
+                <button type="button" class="city-chip" data-city="Tokyo">Tokyo</button>
+                <button type="button" class="city-chip" data-city="Paris">Paris</button>
+                <button type="button" class="city-chip" data-city="Mumbai">Mumbai</button>
+                <button type="button" class="city-chip" data-city="Sydney">Sydney</button>
             </div>
-            <!-- Sunset -->
-            <div class="weather_card">
-                <i class="fa-solid fa-moon"></i>
-                <div>
-                    <p>Sunset</p>
-                    <p class="weather_sunset">15&#176</p>
-                </div>
-            </div>
+        </div>
 
-            <!-- Feels Like -->
-            <div class="weather_card">
-                <i class="fa-solid fa-droplet"></i>
-                <div>
-                    <p>Feels Like</p>
-                    <p class="weather_feelsLike">15&#176</p>
+        <!-- Dashboard Grid View -->
+        <div class="main-dashboard" id="main-dashboard">
+            <!-- Loading Indicator -->
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <p>Fetching weather insights...</p>
                 </div>
             </div>
 
-            <div class="weather_card">
-                <i class="fa-solid fa-droplet"></i>
-                <div>
-                    <p>Humidity</p>
-                    <p class="weather_humidity">15&#176</p>
-                </div>
+            <!-- Error Notification Card -->
+            <div class="error-container hidden" id="error-card">
+                <i class="fa-solid fa-circle-exclamation error-icon"></i>
+                <h3>City Not Found</h3>
+                <p id="error-message">We couldn't retrieve weather data for that location. Please check the spelling and try again.</p>
+                <button class="retry-btn" id="retry-btn">Try Again</button>
             </div>
-            <!-- wind speed -->
-            <div class="weather_card">
-                <i class="fa-solid fa-wind"></i>
-                <div>
-                    <p>Wind</p>
-                    <p class="weather_wind">15&#176</p>
-                </div>
-            </div>
-            <!-- wind degree -->
-            <div class="weather_card">
-                <i class="fa-solid fa-wind"></i>
-                <div>
-                    <p>Wind Flow</p>
-                    <p class="weather_winddeg">15&#176</p>
-                </div>
-            </div>
-            <div class="weather_card">
-                <i class="fa-solid fa-gauge-high"></i>
-                <div>
-                    <p>Pressure</p>
-                    <p class="weather_pressure">15&#176</p>
-                </div>
-            </div>
-            <!-- Latitude -->
-            <div class="weather_card">
-                <i class="fa-solid fa-location-dot"></i>
-                <div>
-                    <p>Latitude</p>
-                    <p class="weather_lat"></p>
-                </div>
-            </div>
-            <!-- Longitude -->
-            <div class="weather_card">
-                <i class="fa-solid fa-location-dot"></i>
-                <div>
-                    <p>Longitude</p>
-                    <p class="weather_long"></p>
-                </div>
-            </div>
-             </div>
-        </section>
-    </section>
 
-    <!-- javascript file -->
-    <!-- js file -->
+            <div class="dashboard-grid" id="dashboard-content">
+                <!-- Main Current Weather Box -->
+                <section class="main-weather-card">
+                    <div class="weather_header_info">
+                        <h2 class="weather_city" id="weather-city">Loading...</h2>
+                        <p class="weather_date_time" id="weather-date-time">--</p>
+                    </div>
+
+                    <div class="weather_main_display">
+                        <div class="weather_icon_container">
+                            <div class="weather_icon" id="weather-icon-div">
+                                <i class="fa-solid fa-cloud-sun weather-main-icon"></i>
+                            </div>
+                        </div>
+                        <div class="weather_temp_block">
+                            <h2 class="weather_temperature" id="weather-temp">--</h2>
+                            <div class="weather_forecast_badge">
+                                <span class="weather_forecast" id="weather-forecast">--</span>
+                                <span class="weather_description" id="weather-description">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="weather_minmax" id="weather-minmax">
+                        <span class="weather_min_badge">
+                            <i class="fa-solid fa-temperature-arrow-down"></i> <span class="weather_min">--</span>
+                        </span>
+                        <span class="weather_max_badge">
+                            <i class="fa-solid fa-temperature-arrow-up"></i> <span class="weather_max">--</span>
+                        </span>
+                    </div>
+                </section>
+
+                <!-- Detailed Weather Metrics Grid (All API Data) -->
+                <section class="metrics-grid">
+                    <!-- Feels Like Card -->
+                    <div class="metric-card glass-panel" id="card-feels-like">
+                        <div class="card-header">
+                            <i class="fa-solid fa-temperature-three-quarters card-icon"></i>
+                            <span class="card-title">Feels Like</span>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-value weather_feelsLike">--</span>
+                            <span class="card-desc">Thermosensation of the current air.</span>
+                        </div>
+                    </div>
+
+                    <!-- Humidity Card -->
+                    <div class="metric-card glass-panel" id="card-humidity">
+                        <div class="card-header">
+                            <i class="fa-solid fa-droplet card-icon"></i>
+                            <span class="card-title">Humidity</span>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-value weather_humidity">--</span>
+                            <div class="progress-container">
+                                <div class="progress-bar" id="humidity-bar" style="width: 0%"></div>
+                            </div>
+                            <span class="card-desc">Amount of water vapor in the atmosphere.</span>
+                        </div>
+                    </div>
+
+                    <!-- Wind Details Card -->
+                    <div class="metric-card glass-panel wind-card" id="card-wind">
+                        <div class="card-header">
+                            <i class="fa-solid fa-wind card-icon"></i>
+                            <span class="card-title">Wind Info</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="wind-main-info">
+                                <span class="card-value weather_wind">--</span>
+                                <span class="card-sub-value weather_wind_gust" id="weather-wind-gust">Gust: --</span>
+                            </div>
+                            <div class="compass-container">
+                                <div class="compass">
+                                    <div class="compass-arrow" id="compass-needle">
+                                        <i class="fa-solid fa-location-arrow"></i>
+                                    </div>
+                                    <span class="compass-dir N">N</span>
+                                    <span class="compass-dir E">E</span>
+                                    <span class="compass-dir S">S</span>
+                                    <span class="compass-dir W">W</span>
+                                </div>
+                                <span class="card-desc compass-deg-label">Direction: <strong class="weather_winddeg">--</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barometric Pressure Card -->
+                    <div class="metric-card glass-panel" id="card-pressure">
+                        <div class="card-header">
+                            <i class="fa-solid fa-gauge-high card-icon"></i>
+                            <span class="card-title">Pressure</span>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-value weather_pressure">--</span>
+                            <div class="pressure-levels" id="pressure-levels">
+                                <span>Sea Level: <strong class="weather_sea_level">--</strong></span>
+                                <span>Ground: <strong class="weather_grnd_level">--</strong></span>
+                            </div>
+                            <span class="card-desc">Atmospheric weight. Standard is ~1013 hPa.</span>
+                        </div>
+                    </div>
+
+                    <!-- Cloudiness Card -->
+                    <div class="metric-card glass-panel" id="card-clouds">
+                        <div class="card-header">
+                            <i class="fa-solid fa-cloud card-icon"></i>
+                            <span class="card-title">Cloudiness</span>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-value weather_clouds" id="weather-clouds-val">--</span>
+                            <div class="progress-container">
+                                <div class="progress-bar" id="clouds-bar" style="width: 0%"></div>
+                            </div>
+                            <span class="card-desc">Percentage of the sky covered by clouds.</span>
+                        </div>
+                    </div>
+
+                    <!-- Visibility Card -->
+                    <div class="metric-card glass-panel" id="card-visibility">
+                        <div class="card-header">
+                            <i class="fa-solid fa-eye card-icon"></i>
+                            <span class="card-title">Visibility</span>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-value weather_visibility" id="weather-visibility-val">--</span>
+                            <div class="visibility-status" id="visibility-status-desc">--</div>
+                            <span class="card-desc">Max distance of clear horizontal vision.</span>
+                        </div>
+                    </div>
+
+                    <!-- Sunrise & Sunset Card -->
+                    <div class="metric-card glass-panel sun-card" id="card-sun">
+                        <div class="card-header">
+                            <i class="fa-solid fa-circle-half-stroke card-icon"></i>
+                            <span class="card-title">Daylight Dynamics</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="sun-timeline-wrapper">
+                                <div class="sun-time-item">
+                                    <i class="fa-solid fa-circle-chevron-up text-sunrise"></i>
+                                    <div>
+                                        <p class="sun-label">Sunrise</p>
+                                        <p class="sun-value weather_sunrise">--</p>
+                                    </div>
+                                </div>
+                                <div class="sun-time-item">
+                                    <i class="fa-solid fa-circle-chevron-down text-sunset"></i>
+                                    <div>
+                                        <p class="sun-label">Sunset</p>
+                                        <p class="sun-value weather_sunset">--</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="daylight-duration" id="daylight-duration-desc">Daylight duration: --</div>
+                        </div>
+                    </div>
+
+                    <!-- Geo-Location Card -->
+                    <div class="metric-card glass-panel" id="card-coords">
+                        <div class="card-header">
+                            <i class="fa-solid fa-map-location-dot card-icon"></i>
+                            <span class="card-title">Coordinates</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="coordinates-display">
+                                <div>Latitude: <strong class="weather_lat">--</strong></div>
+                                <div>Longitude: <strong class="weather_long">--</strong></div>
+                            </div>
+                            <a href="#" id="view-map-link" class="map-link" target="_blank">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Maps
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer for visual completion -->
+    <footer class="app-footer-bar">
+        <p>&copy; 2026 SkySync Weather. Powered by OpenWeatherMap. All rights reserved.</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

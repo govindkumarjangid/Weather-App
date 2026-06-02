@@ -405,7 +405,15 @@ elRetryBtn.addEventListener("click", () => {
 });
 
 // Initialization
+const initFooterYear = () => {
+    const yearEl = document.getElementById("current-year");
+    if (yearEl) {
+        yearEl.textContent = new Date().getFullYear();
+    }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
+    initFooterYear();
     initSearchHistory();
     triggerGeolocation();
 });

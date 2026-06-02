@@ -41,36 +41,24 @@ const elErrorCard = document.getElementById("error-card");
 const elDashboardContent = document.getElementById("dashboard-content");
 const elRetryBtn = document.getElementById("retry-btn");
 
-// State Management
 let cachedWeatherData = null;
-let currentUnit = "C"; // C = Celsius, F = Fahrenheit
+let currentUnit = "C";
 let searchHistory = ["London", "New York", "Tokyo", "Paris", "Mumbai", "Sydney"];
 const API_KEY = "41e27946beea978b29abf01e65e8d655";
 
-// Load search history from localStorage
 const initSearchHistory = () => {
     const saved = localStorage.getItem("skysync_history");
-    if (saved) {
-        searchHistory = JSON.parse(saved);
-    }
+    if (saved) searchHistory = JSON.parse(saved);
     renderQuickCities();
 };
 
 const saveSearchHistory = (city) => {
     if (!city) return;
-    
-    // Normalize casing
     const formattedCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
-    
-    // Remove if already exists to place it at the front
     searchHistory = searchHistory.filter(c => c.toLowerCase() !== formattedCity.toLowerCase());
     searchHistory.unshift(formattedCity);
-    
-    // Cap at 6 cities
-    if (searchHistory.length > 6) {
+    if (searchHistory.length > 6)
         searchHistory.pop();
-    }
-    
     localStorage.setItem("skysync_history", JSON.stringify(searchHistory));
     renderQuickCities();
 };
@@ -87,7 +75,6 @@ const renderQuickCities = () => {
     });
 };
 
-// Utilities for translations & dates
 const getCountryName = (code) => {
     try {
         return new Intl.DisplayNames(["en"], { type: "region" }).of(code);
@@ -97,11 +84,8 @@ const getCountryName = (code) => {
 };
 
 const getDateTime = (dt, timezoneOffset) => {
-    // Calculate timestamp using the target location's timezone offset
-    // dt is in seconds, timezoneOffset is in seconds
     const utcTimeMs = (dt + timezoneOffset) * 1000;
     const utcDate = new Date(utcTimeMs);
-    
     const options = {
         weekday: "long",
         year: "numeric",
@@ -109,7 +93,7 @@ const getDateTime = (dt, timezoneOffset) => {
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        timeZone: "UTC" // We format in UTC because timezoneOffset shift was done manually
+        timeZone: "UTC"
     };
     return new Intl.DateTimeFormat("en-US", options).format(utcDate);
 };
@@ -132,38 +116,29 @@ const getDaylightDuration = (sunrise, sunset) => {
     return `${hours} hours and ${minutes} minutes`;
 };
 
-// Map Weather Codes to FontAwesome icons
 const getWeatherIcon = (id, iconCode) => {
     const isNight = iconCode.endsWith('n');
-    if (id >= 200 && id < 300) {
+    if (id >= 200 && id < 300)
         return `<i class="fa-solid fa-cloud-bolt weather-main-icon" style="color: #f59e0b;"></i>`;
-    }
-    if (id >= 300 && id < 400) {
+    if (id >= 300 && id < 400)
         return `<i class="fa-solid fa-cloud-drizzle weather-main-icon" style="color: #60a5fa;"></i>`;
-    }
-    if (id >= 500 && id < 600) {
+    if (id >= 500 && id < 600)
         return `<i class="fa-solid fa-cloud-showers-heavy weather-main-icon" style="color: #3b82f6;"></i>`;
-    }
-    if (id >= 600 && id < 700) {
+    if (id >= 600 && id < 700)
         return `<i class="fa-solid fa-snowflake weather-main-icon" style="color: #a5f3fc; animation: spin 8s linear infinite;"></i>`;
-    }
-    if (id >= 700 && id < 800) {
+    if (id >= 700 && id < 800)
         return `<i class="fa-solid fa-smog weather-main-icon" style="color: #cbd5e1;"></i>`;
-    }
-    if (id === 800) {
-        return isNight 
+    if (id === 800)
+        return isNight
             ? `<i class="fa-solid fa-moon weather-main-icon" style="color: #e2e8f0;"></i>`
             : `<i class="fa-solid fa-sun weather-main-icon" style="color: #f59e0b; animation: spin 20s linear infinite;"></i>`;
-    }
-    if (id >= 801 && id < 805) {
+    if (id >= 801 && id < 805)
         return isNight
             ? `<i class="fa-solid fa-cloud-moon weather-main-icon" style="color: #94a3b8;"></i>`
             : `<i class="fa-solid fa-cloud-sun weather-main-icon" style="color: #fbbf24;"></i>`;
-    }
     return `<i class="fa-solid fa-cloud weather-main-icon"></i>`;
 };
 
-// Get dynamic body style class
 const getThemeClass = (id, iconCode) => {
     const isNight = iconCode.endsWith('n');
     if (isNight) return 'weather-night';
@@ -176,10 +151,9 @@ const getThemeClass = (id, iconCode) => {
     return '';
 };
 
-// Conversions
 const formatTemp = (celsiusVal) => {
     if (currentUnit === "F") {
-        const fahr = (celsiusVal * 9/5) + 32;
+        const fahr = (celsiusVal * 9 / 5) + 32;
         return `${fahr.toFixed(0)}°F`;
     }
     return `${celsiusVal.toFixed(0)}°C`;
@@ -212,27 +186,20 @@ const getVisibilityStatus = (meters) => {
 // Render Weather Data UI
 const displayWeatherData = () => {
     if (!cachedWeatherData) return;
-    
     const d = cachedWeatherData;
     const timezone = d.timezone;
-    
-    // Core Layout Displays
     elCity.textContent = `${d.name}, ${getCountryName(d.sys.country)}`;
     elDateTime.textContent = getDateTime(d.dt, timezone);
     elForecast.textContent = d.weather[0].main;
     elDescription.textContent = d.weather[0].description;
     elIconDiv.innerHTML = getWeatherIcon(d.weather[0].id, d.weather[0].icon);
-    
-    // Core Temperatures
     elTemp.innerHTML = formatTemp(d.main.temp);
     elMinTemp.innerHTML = `Min: ${formatTemp(d.main.temp_min)}`;
     elMaxTemp.innerHTML = `Max: ${formatTemp(d.main.temp_max)}`;
-    
-    // Secondary metrics
     elFeelsLike.innerHTML = formatTemp(d.main.feels_like);
     elHumidity.innerHTML = `${d.main.humidity}%`;
     elHumidityBar.style.width = `${d.main.humidity}%`;
-    
+
     // Wind Info & compass arrow
     elWind.innerHTML = formatWindSpeed(d.wind.speed);
     if (d.wind.gust !== undefined) {
@@ -242,45 +209,34 @@ const displayWeatherData = () => {
         elWindGust.classList.add("hidden");
     }
     elWindDeg.innerHTML = `${d.wind.deg}°`;
-    // Rotate needle (the location-arrow points 45deg top-right by default, so subtract 45)
     elCompassNeedle.style.transform = `rotate(${d.wind.deg - 45}deg)`;
-    
-    // Pressure
     elPressure.innerHTML = `${d.main.pressure} hPa`;
-    
+
     let levelsHtml = "";
-    if (d.main.sea_level) {
+    if (d.main.sea_level)
         levelsHtml += `<span>Sea Level: <strong>${d.main.sea_level} hPa</strong></span>`;
-    }
-    if (d.main.grnd_level) {
+    if (d.main.grnd_level)
         levelsHtml += `<span>Ground Level: <strong>${d.main.grnd_level} hPa</strong></span>`;
-    }
     elPressureLevels.innerHTML = levelsHtml;
-    
-    // Clouds
+
     elCloudsVal.innerHTML = `${d.clouds.all}%`;
     elCloudsBar.style.width = `${d.clouds.all}%`;
-    
-    // Visibility
+
     elVisibilityVal.innerHTML = formatVisibility(d.visibility);
     elVisibilityDesc.innerHTML = getVisibilityStatus(d.visibility);
-    
-    // Sun Timeline
+
     elSunrise.innerHTML = formatTime(d.sys.sunrise, timezone);
     elSunset.innerHTML = formatTime(d.sys.sunset, timezone);
     elDaylightDesc.innerHTML = `Daylight duration: <strong>${getDaylightDuration(d.sys.sunrise, d.sys.sunset)}</strong>`;
-    
-    // Coordinates & Map
+
     elLat.innerHTML = d.coord.lat.toFixed(4);
     elLong.innerHTML = d.coord.lon.toFixed(4);
     elMapLink.href = `https://www.google.com/maps/search/?api=1&query=${d.coord.lat},${d.coord.lon}`;
-    
-    // Dynamic Theme Styling
+
     const bodyClass = getThemeClass(d.weather[0].id, d.weather[0].icon);
-    document.body.className = ""; // clear
-    if (bodyClass) {
-        document.body.classList.add(bodyClass);
-    }
+    document.body.className = "";
+    if (bodyClass) document.body.classList.add(bodyClass);
+
 };
 
 // Fetchers
@@ -290,9 +246,7 @@ const getWeatherDataByCity = async (city) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
     try {
         const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Location not found (${res.status})`);
-        }
+        if (!res.ok) throw new Error(`Location not found (${res.status})`);
         const data = await res.json();
         cachedWeatherData = data;
         saveSearchHistory(data.name);
@@ -311,9 +265,7 @@ const getWeatherDataByCoords = async (lat, lon) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
     try {
         const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Location not found (${res.status})`);
-        }
+        if (!res.ok) throw new Error(`Location not found (${res.status})`);
         const data = await res.json();
         cachedWeatherData = data;
         displayWeatherData();
@@ -339,9 +291,8 @@ const showLoading = (isLoading) => {
 const showError = (msg) => {
     elErrorCard.classList.remove("hidden");
     elDashboardContent.classList.add("hidden");
-    if (msg) {
-        document.getElementById("error-message").textContent = msg;
-    }
+    if (msg) document.getElementById("error-message").textContent = msg;
+
 };
 
 const hideError = () => {
@@ -358,7 +309,6 @@ const triggerGeolocation = () => {
             },
             (err) => {
                 console.warn(`Geolocation failed: ${err.message}. Loading default city.`);
-                // Fallback to default
                 getWeatherDataByCity("jaipur");
             },
             { timeout: 8000 }
@@ -395,7 +345,6 @@ elUnitCheckbox.addEventListener("change", (e) => {
         elUnitC.classList.remove("active");
         elUnitF.classList.add("active");
     }
-    // Redraw UI with new values
     displayWeatherData();
 });
 
@@ -407,9 +356,8 @@ elRetryBtn.addEventListener("click", () => {
 // Initialization
 const initFooterYear = () => {
     const yearEl = document.getElementById("current-year");
-    if (yearEl) {
-        yearEl.textContent = new Date().getFullYear();
-    }
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
 };
 
 document.addEventListener("DOMContentLoaded", () => {
